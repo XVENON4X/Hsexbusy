@@ -69,6 +69,16 @@
       box-shadow: 0 0 10px #00ff00;
     }
 
+    .offline {
+      border-color: #ff0000;
+      color: #ff0000;
+    }
+
+    .bad-gateway {
+      border-color: #ffaa00;
+      color: #ffaa00;
+    }
+
     .matrix {
       position: absolute;
       top: 0;
@@ -87,7 +97,7 @@
 <body>
   <div class="terminal">
     <h1>Witaj w systemie HEX93x</h1>
-    <a class="status-button" href="https://hex93x.online" target="_blank">🟢 Status: ONLINE</a>
+    <a class="status-button" id="statusBtn" href="https://hex93x.online" target="_blank">🔄 Sprawdzanie statusu...</a>
   </div>
 
   <div class="matrix">
@@ -95,7 +105,7 @@
   </div>
 
   <script>
-    // Matrix-style background
+    // Matrix rain effect
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -110,15 +120,13 @@
     function drawMatrix() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       ctx.fillStyle = "#0F0";
       ctx.font = fontSize + "px monospace";
 
-      for(let i = 0; i < drops.length; i++) {
+      for (let i = 0; i < drops.length; i++) {
         const text = letters[Math.floor(Math.random() * letters.length)];
         ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
         drops[i]++;
@@ -131,6 +139,31 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     });
+
+    // Status checker
+    async function checkStatus() {
+      const btn = document.getElementById("statusBtn");
+
+      try {
+        const response = await fetch("https://hex93x.online", {
+          method: "GET",
+          mode: "no-cors"
+        });
+
+        // NOTE: no-cors mode won't allow us to read the status,
+        // so we assume if fetch didn't throw error, it's online.
+        btn.textContent = "🟢 Status: ONLINE";
+      } catch (error) {
+        // Could not connect or 5xx error
+        btn.textContent = "🟥 Status: OFFLINE";
+        btn.classList.add("offline");
+      }
+
+      // Optional: use cors proxy if you need to read status codes
+      // (Not recommended unless you control the proxy)
+    }
+
+    checkStatus();
   </script>
 </body>
 </html>
