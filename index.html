@@ -1,1 +1,127 @@
-# Hsexbusy
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terminal Access</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #0f0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        .terminal-text {
+            font-size: 2em;
+            text-align: center;
+            animation: blink 1s step-end infinite;
+            text-shadow: 0 0 10px #0f0;
+        }
+
+        .ascii-art {
+            font-size: 4em;
+            margin-bottom: 50px;
+            opacity: 0.7;
+        }
+
+        .status-link {
+            color: #0f0;
+            text-decoration: none;
+            font-size: 1.5em;
+            padding: 20px;
+            border: 2px solid #0f0;
+            border-radius: 10px;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .status-link:hover {
+            background-color: #0f0;
+            color: #000;
+            box-shadow: 0 0 20px #0f0;
+        }
+
+        @keyframes blink {
+            50% { opacity: 1; }
+            51% { opacity: 0.3; }
+            99% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            25% { transform: translate(-2px, 2px); }
+            50% { transform: translate(-2px, -2px); }
+            75% { transform: translate(2px, 2px); }
+        }
+
+        .glitch {
+            animation: glitch 1s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .terminal-text {
+                font-size: 1.5em;
+            }
+            
+            .ascii-art {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="glitch ascii-art">
+            _______       ___       ________      __
+           |___  / |    | | \     / /_   _|     / /
+             / /| |_____| |\ \   / /  | |_____./ /
+            / /_| |_______| \ \ / /   | |_____/ /
+           /____/|_______| \  \/ /    |_|    |/
+        </div>
+
+        <div class="terminal-text glitch">Welcome to the matrix...</div>
+        
+        <a href="https://hex93x.online" target="_blank" class="status-link">
+            Click here to access your portal
+        </a>
+    </div>
+
+    <script>
+        // Dodatkowy efekt: losowa zmiana ASCII art co chwilę
+        const asciiArt = [
+            " _______       ___       ________      __",
+            "|___  / |    | | \\     / /_   _|     / /",
+            "  / /| |_____| |\\ \\   / /  | |_____./ /",
+            " / /_| |_______| \\ \\ / /   | |_____/ /",
+            "/____/|_______| \\  \\/ /    |_|    |/",
+        ];
+
+        function changeAscii() {
+            const asciiElement = document.querySelector('.ascii-art');
+            const randomLine = Math.floor(Math.random() * asciiArt.length);
+            
+            if (randomLine === 2) { // Co drugi raz zmieniaj kolor
+                asciiElement.style.color = '#0f0';
+            } else {
+                asciiElement.style.color = '#ff0'; // Zmiana na pomarańczowy efekt
+            }
+            
+            asciiElement.innerHTML = asciiArt[randomLine];
+        }
+
+        setInterval(changeAscii, 3000);
+    </script>
+</body>
+</html>
