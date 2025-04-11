@@ -1,127 +1,136 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terminal Access</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #000;
-            color: #0f0;
-            font-family: 'Courier New', Courier, monospace;
-            overflow-x: hidden;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Witaj w strefie HEX93x</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #000;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            flex-direction: column;
-        }
+    .terminal {
+      text-align: center;
+      animation: flicker 3s infinite;
+    }
 
-        .terminal-text {
-            font-size: 2em;
-            text-align: center;
-            animation: blink 1s step-end infinite;
-            text-shadow: 0 0 10px #0f0;
-        }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      animation: typing 4s steps(30, end), blink 0.75s step-end infinite;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid #00ff00;
+      width: 0;
+    }
 
-        .ascii-art {
-            font-size: 4em;
-            margin-bottom: 50px;
-            opacity: 0.7;
-        }
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
 
-        .status-link {
-            color: #0f0;
-            text-decoration: none;
-            font-size: 1.5em;
-            padding: 20px;
-            border: 2px solid #0f0;
-            border-radius: 10px;
-            margin-top: 30px;
-            transition: all 0.3s ease;
-        }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
 
-        .status-link:hover {
-            background-color: #0f0;
-            color: #000;
-            box-shadow: 0 0 20px #0f0;
-        }
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        opacity: 0.3;
+      }
+    }
 
-        @keyframes blink {
-            50% { opacity: 1; }
-            51% { opacity: 0.3; }
-            99% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+    .status-button {
+      display: inline-block;
+      padding: 1rem 2rem;
+      margin-top: 20px;
+      background-color: #001a00;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      font-size: 1.2rem;
+      text-decoration: none;
+      transition: all 0.3s ease-in-out;
+    }
 
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            25% { transform: translate(-2px, 2px); }
-            50% { transform: translate(-2px, -2px); }
-            75% { transform: translate(2px, 2px); }
-        }
+    .status-button:hover {
+      background-color: #00ff00;
+      color: #000;
+      box-shadow: 0 0 10px #00ff00;
+    }
 
-        .glitch {
-            animation: glitch 1s infinite;
-        }
+    .matrix {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
 
-        @media (max-width: 768px) {
-            .terminal-text {
-                font-size: 1.5em;
-            }
-            
-            .ascii-art {
-                font-size: 3em;
-            }
-        }
-    </style>
+    canvas {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="glitch ascii-art">
-            _______       ___       ________      __
-           |___  / |    | | \     / /_   _|     / /
-             / /| |_____| |\ \   / /  | |_____./ /
-            / /_| |_______| \ \ / /   | |_____/ /
-           /____/|_______| \  \/ /    |_|    |/
-        </div>
+  <div class="terminal">
+    <h1>Witaj w systemie HEX93x</h1>
+    <a class="status-button" href="https://hex93x.online" target="_blank">🟢 Status: ONLINE</a>
+  </div>
 
-        <div class="terminal-text glitch">Welcome to the matrix...</div>
-        
-        <a href="https://hex93x.online" target="_blank" class="status-link">
-            Click here to access your portal
-        </a>
-    </div>
+  <div class="matrix">
+    <canvas id="matrixCanvas"></canvas>
+  </div>
 
-    <script>
-        // Dodatkowy efekt: losowa zmiana ASCII art co chwilę
-        const asciiArt = [
-            " _______       ___       ________      __",
-            "|___  / |    | | \\     / /_   _|     / /",
-            "  / /| |_____| |\\ \\   / /  | |_____./ /",
-            " / /_| |_______| \\ \\ / /   | |_____/ /",
-            "/____/|_______| \\  \\/ /    |_|    |/",
-        ];
+  <script>
+    // Matrix-style background
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
 
-        function changeAscii() {
-            const asciiElement = document.querySelector('.ascii-art');
-            const randomLine = Math.floor(Math.random() * asciiArt.length);
-            
-            if (randomLine === 2) { // Co drugi raz zmieniaj kolor
-                asciiElement.style.color = '#0f0';
-            } else {
-                asciiElement.style.color = '#ff0'; // Zmiana na pomarańczowy efekt
-            }
-            
-            asciiElement.innerHTML = asciiArt[randomLine];
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function drawMatrix() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#0F0";
+      ctx.font = fontSize + "px monospace";
+
+      for(let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
         }
+        drops[i]++;
+      }
+    }
 
-        setInterval(changeAscii, 3000);
-    </script>
+    setInterval(drawMatrix, 33);
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+  </script>
 </body>
 </html>
